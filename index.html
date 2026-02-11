@@ -117,7 +117,7 @@
       // debug.style.display = "block";
       // debug.textContent = "Android intent URL: " + intentUrl;
 
-      hint.textContent = "앱 열기를 시도 중입니다…";
+      hint.textContent = "세브메뉴를 실행합니다.";
       location.href = intentUrl;
     }
 
@@ -129,7 +129,7 @@
       // debug.style.display = "block";
       // debug.textContent = "iOS scheme URL: " + schemeUrl;
 
-      hint.textContent = "앱 열기를 시도 중입니다…";
+      hint.textContent = "세브메뉴를 실행합니다.";
       location.href = schemeUrl;
 
       setTimeout(() => {
@@ -140,7 +140,7 @@
     // 1) 데스크탑/기타(=모바일 아님)
     if (!isAndroid && !isIOS) {
       subtitle.textContent =
-        '모바일로 이용하시면 앱 접속 링크를 확인하실 수 있습니다. 아래 링크를 클릭하시면 앱스토어에 접속하실 수 있습니다';
+        '모바일로 이용하시면 앱 접속 링크를 확인하실 수 있습니다. 아래 링크를 클릭하시면 앱스토어에 접속하실 수 있습니다.';
 
       buttons.appendChild(makeBtn({ id: "androidBtn", text: "Android", href: PLAY_STORE_URL, cls: "secondary" }));
       buttons.appendChild(makeBtn({ id: "appleBtn", text: "Apple", href: APP_STORE_URL, cls: "secondary" }));
@@ -156,7 +156,7 @@
 
     // 3) iOS
     if (isIOS) {
-      subtitle.textContent = '화면 상단에 "열기" 버튼 클릭.';
+      subtitle.textContent = 'Safari로 실행하여 화면 상단 "열기" 버튼을 클릭하면 세브메뉴로 연결됩니다.';
 
       buttons.appendChild(makeBtn({ id: "dlBtn", text: "앱 다운받기", href: APP_STORE_URL, cls: "secondary" }));
       // (원하면 iOS에도 실행 버튼을 추가할 수 있음. 지금 요구사항대로는 추가 안 함.)
