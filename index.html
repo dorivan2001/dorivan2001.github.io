@@ -24,8 +24,29 @@
     p  { margin: 0 0 12px; opacity: .9; line-height: 1.55; }
     .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
     button, a.btn {
-      appearance: none; border: 0; border-radius: 12px; padding: 12px 14px;
-      font-weight: 800; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
+        -webkit-appearance: none;
+  appearance: none;
+
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 14px;
+
+  /* ✅ 폰트 완전 통일(안드로이드에서 특히 효과 큼) */
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+
+  cursor: pointer;
+  text-decoration: none;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* ✅ 버튼의 기본 min-height/텍스트 렌더링 차이 방지 */
+  white-space: nowrap;
     }
     .primary { background: #111; color: #fff; }
     .secondary { background: rgba(0,0,0,.08); color: #111; }
@@ -39,24 +60,6 @@
       .secondary { background: rgba(255,255,255,.12); color: #fff; }
       .run { background: #3F8EF7; color: #fff; }
     }
-    <!-- ✅ CSS에서 button과 a.btn의 폰트 크기를 동일하게 고정 -->
-   /* ...기존 스타일들... */
-
-  button, a.btn {
-    appearance: none;
-    border: 0;
-    border-radius: 12px;
-    padding: 12px 14px;
-    font-weight: 800;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-
-    /* ✅ 추가: 폰트 사이즈/라인높이 통일 */
-    font-size: 16px;
-    line-height: 1;
-  }
 
   </style>
 </head>
