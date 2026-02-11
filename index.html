@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SevMenu 열기</title>
+  <meta name="description" content="SevMenu 앱에서 바로 열기" />
+
+  <!-- iOS Smart App Banner (iOS Safari에서 상단 배너로 '열기/보기' 제공)
+       app-id는 App Store Connect의 앱 ID (숫자)로 교체 -->
+  <meta name="apple-itunes-app" content="app-id=6499293178, app-argument=sevmenu://open" />
+
+  <!-- 공유용(Open Graph) -->
+  <meta property="og:title" content="SevMenu 열기" />
+  <meta property="og:description" content="앱에서 바로 열어보세요." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="" />
+
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif; margin: 0; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 24px; }
+    .card { border: 1px solid rgba(0,0,0,.12); border-radius: 16px; padding: 20px; }
+    h1 { margin: 0 0 8px; font-size: 22px; }
+    p  { margin: 0 0 14px; opacity: .85; line-height: 1.5; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    button, a.btn {
+      appearance: none; border: 0; border-radius: 12px; padding: 12px 14px;
+      font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .primary { background: #111; color: #fff; }
+    .secondary { background: rgba(0,0,0,.08); color: #111; }
+    .small { font-size: 13px; opacity: .8; margin-top: 10px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 12px; opacity: .75; word-break: break-all; }
+    @media (prefers-color-scheme: dark) {
+      .card { border-color: rgba(255,255,255,.16); }
+      .primary { background: #fff; color: #000; }
+      .secondary { background: rgba(255,255,255,.12); color: #fff; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>SevMenu 열기</h1>
+      <p id="subtitle">앱이 설치되어 있으면 자동으로 열립니다. 설치되어 있지 않다면 스토어로 안내합니다.</p>
+
+      <div class="row">
+        <button id="openBtn" class="primary">앱에서 열기</button>
+        <a id="storeBtn" class="btn secondary" href="#" rel="noopener">스토어로 이동</a>
+      </div>
+
+      <p class="small" id="hint"></p>
+      <div class="mono" id="debug"></div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ✅ 너가 채워야 하는 값들
+     */
+    const ANDROID_PACKAGE = "com.sev.menu"; // 예: com.example.sevmenu
+    const PLAY_STORE_URL  = "https://play.google.com/store/apps/details?id=" + encodeURIComponent(ANDROID_PACKAGE);
+
+    // iOS App Store 링크 (없으면 일단 앱스토어 검색 링크라도 넣어두기)
+    const APP_STORE_URL   = "https://apps.apple.com/app/id6499293178"; // 예: https://apps.apple.com/kr/app/id1234567890
+
+    // (선택) 커스텀 스킴이 이미 있다면 활성화: 설치된 앱을 "확실히" 열고 싶을 때 도움됨
+    // iOS/Android 모두에서 동작하지만, App Links/Universal Links가 정석.
+    const CUSTOM_SCHEME_PREFIX = "sevmenu://open"; // 예: sevmenu://menu?...
+
+    // (선택) Android intent:// 폴백(Chrome 계열에서 잘 동작). 패키지/스킴 정확해야 함.
+    const ANDROID_INTENT_SCHEME = "sevmenu"; // CUSTOM_SCHEME_PREFIX의 스킴 부분 (sevmenu:// => sevmenu)
+    function makeAndroidIntentUrl(pathAndQuery) {
+      // intent://<host+path>?<query>#Intent;scheme=...;package=...;S.browser_fallback_url=...;end
+      // 여기서는 host를 비워두고 path/query만 넘기는 형태로 구성
+      const fallback = encodeURIComponent(PLAY_STORE_URL);
+      const pq = pathAndQuery.startsWith("/") ? pathAndQuery.slice(1) : pathAndQuery;
+      return `intent://${pq}#Intent;scheme=${ANDROID_INTENT_SCHEME};package=${ANDROID_PACKAGE};S.browser_fallback_url=${fallback};end`;
+    }
+
+    /**
+     * 현재 URL(https)에서 경로/쿼리를 그대로 앱으로 전달하기 위한 helper
+     * 예: https://sevmenu.app/menu/123?meal=lunch  ->  /menu/123?meal=lunch
+     */
+    const pathAndQuery = location.pathname + location.search + location.hash;
+
+    /**
+     * 플랫폼 감지
+     */
+    const ua = navigator.userAgent || "";
+    const isAndroid = /Android/i.test(ua);
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+    /**
+     * 스토어 버튼 링크 설정
+     */
+    const storeBtn = document.getElementById("storeBtn");
+    storeBtn.href = isAndroid ? PLAY_STORE_URL : (isIOS ? APP_STORE_URL : PLAY_STORE_URL);
+
+    /**
+     * 앱 열기 시도 로직:
+     * - 설치되어 있으면 앱이 열림
+     * - 미설치면 (iOS는 웹에 남는 경우가 많아서) 안내 + 버튼 제공
+     * - Android는 intent://로 폴백을 주면 미설치 시 Play Store로 더 자연스럽게 갈 수 있음
+     */
+    function tryOpenApp() {
+      const debug = document.getElementById("debug");
+      const hint = document.getElementById("hint");
+
+      // 1) App Links / Universal Links는 원래 "이 페이지 자체"가 링크일 때 자동으로 앱이 열리게 됨.
+      //    다만 사용자가 이미 웹으로 들어온 상태라면, 버튼으로 앱 열기 유도를 추가로 제공.
+      // 2) 여기서는 커스텀 스킴/intent를 사용해 “앱 열기”를 적극 시도.
+
+      if (isAndroid) {
+        // Android: intent:// 우선 (미설치면 browser_fallback_url로 스토어 이동 가능성이 큼)
+        const intentUrl = makeAndroidIntentUrl(pathAndQuery);
+        debug.textContent = "Android intent URL: " + intentUrl;
+        location.href = intentUrl;
+        hint.textContent = "안드로이드에서 앱 열기를 시도 중입니다…";
+        return;
+      }
+
+      if (isIOS) {
+        // iOS: 커스텀 스킴은 팝업/제약이 있을 수 있어도, '앱 열기' 유도 용도로는 흔히 사용
+        const schemeUrl = CUSTOM_SCHEME_PREFIX + pathAndQuery;
+        debug.textContent = "iOS scheme URL: " + schemeUrl;
+
+        const start = Date.now();
+        location.href = schemeUrl;
+
+        // 미설치면 보통 그대로 남아있으니, 짧게 기다렸다가 앱스토어 안내(강제 리다이렉트는 지양)
+        setTimeout(() => {
+          // 앱이 열렸다면 페이지가 background로 가거나 unload되기 때문에 아래가 실행되지 않는 경우가 많음
+          const elapsed = Date.now() - start;
+          hint.textContent = "앱이 열리지 않으면 아래 '스토어로 이동'을 눌러 설치해 주세요.";
+        }, 800);
+
+        return;
+      }
+
+      // Desktop/기타: 그냥 안내
+      hint.textContent = "모바일에서 열면 앱으로 연결됩니다. (안드로이드/아이폰)";
+      debug.textContent = "Current path+query: " + pathAndQuery;
+    }
+
+    /**
+     * 자동 실행(옵션): 랜딩하자마자 한 번 시도하고 싶으면 true
+     * - 단, iOS에서는 사용자가 원치 않게 스킴 팝업이 뜰 수 있어 false를 기본 추천
+     */
+    const AUTO_TRY_OPEN = false;
+
+    const openBtn = document.getElementById("openBtn");
+    openBtn.addEventListener("click", tryOpenApp);
+
+    // 텍스트 약간 보정
+    const subtitle = document.getElementById("subtitle");
+    if (isAndroid) subtitle.textContent = "안드로이드: 앱이 설치되어 있으면 열리고, 아니면 Play 스토어로 안내합니다.";
+    else if (isIOS) subtitle.textContent = "아이폰: 앱이 설치되어 있으면 열립니다. 미설치 시 App Store에서 설치해 주세요. (상단 배너가 보일 수 있어요)";
+    else subtitle.textContent = "모바일(안드로이드/아이폰)에서 열면 앱으로 연결됩니다.";
+
+    if (AUTO_TRY_OPEN) {
+      // 사용자가 링크 클릭으로 들어온 경우 자동 시도(필요 시 켜기)
+      tryOpenApp();
+    }
+
+    // OG url 채우기
+    document.querySelector('meta[property="og:url"]').setAttribute("content", location.href);
+  </script>
+</body>
+</html>
