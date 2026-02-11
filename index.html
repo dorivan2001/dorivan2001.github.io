@@ -101,11 +101,27 @@
 
     if (isAndroid) {
       // ✅ 가장 안정적: App Link URL로 이동 (설치되면 OS가 앱으로 전환)
-      const appLinkUrl = buildAppLinkUrl();
-      debug.textContent = "Android → open via App Link: " + appLinkUrl;
-      hint.textContent = "앱 열기를 시도 중입니다…";
-      location.href = appLinkUrl;
-      return;
+        // 현재 페이지가 "/"라면 app 홈으로, 아니면 현재 경로를 그대로 전달
+        const deepPath = (location.pathname === "/" ? "/app/" : ("/app" + location.pathname))
+                    + location.search + location.hash;
+
+  // intent:// 는 host가 필요해서 github host를 붙여주는 형태가 제일 안정적
+  const fallback = encodeURIComponent(PLAY_STORE_URL);
+
+  // intent://dorivan2001.github.io/app/...#Intent;scheme=https;package=...;S.browser_fallback_url=...;end
+  const intentUrl =
+    `intent://${"dorivan2001.github.io" + deepPath}` +
+    `#Intent;scheme=https;package=${ANDROID_PACKAGE};S.browser_fallback_url=${fallback};end`;
+
+  debug.textContent = "Android intent URL: " + intentUrl;
+  hint.textContent = "앱 열기를 시도 중입니다…";
+  location.href = intentUrl;
+  return;
+  //     const appLinkUrl = buildAppLinkUrl();
+  //     debug.textContent = "Android → open via App Link: " + appLinkUrl;
+  //     hint.textContent = "앱 열기를 시도 중입니다…";
+  //     location.href = appLinkUrl;
+  //     return;
     }
 
     if (isIOS) {
