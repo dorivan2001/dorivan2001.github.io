@@ -39,6 +39,25 @@
       .secondary { background: rgba(255,255,255,.12); color: #fff; }
       .run { background: #3F8EF7; color: #fff; }
     }
+    <!-- ✅ CSS에서 button과 a.btn의 폰트 크기를 동일하게 고정 -->
+   /* ...기존 스타일들... */
+
+  button, a.btn {
+    appearance: none;
+    border: 0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+
+    /* ✅ 추가: 폰트 사이즈/라인높이 통일 */
+    font-size: 16px;
+    line-height: 1;
+  }
+
   </style>
 </head>
 
