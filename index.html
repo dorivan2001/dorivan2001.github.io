@@ -3,16 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SevMenu 열기</title>
-  <meta name="description" content="SevMenu 앱에서 바로 열기" />
+  <title>세브메뉴 이용하기</title>
+  <meta name="description" content="세브메뉴 이용하기" />
 
-  <!-- iOS Smart App Banner (iOS Safari에서 상단 배너로 '열기/보기' 제공)
-       app-id는 App Store Connect의 앱 ID (숫자)로 교체 -->
+  <!-- iOS Smart App Banner -->
   <meta name="apple-itunes-app" content="app-id=6499293178, app-argument=sevmenu://open" />
 
   <!-- 공유용(Open Graph) -->
-  <meta property="og:title" content="SevMenu 열기" />
-  <meta property="og:description" content="앱에서 바로 열어보세요." />
+  <meta property="og:title" content="세브메뉴 이용하기" />
+  <meta property="og:description" content="세브메뉴는 학생 프로젝트로 개발된 연세의료원 메뉴 앱입니다." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="" />
 
@@ -21,21 +20,24 @@
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif; margin: 0; }
     .wrap { max-width: 720px; margin: 0 auto; padding: 24px; }
     .card { border: 1px solid rgba(0,0,0,.12); border-radius: 16px; padding: 20px; }
-    h1 { margin: 0 0 8px; font-size: 22px; }
-    p  { margin: 0 0 14px; opacity: .85; line-height: 1.5; }
+    h1 { margin: 0 0 10px; font-size: 22px; }
+    p  { margin: 0 0 12px; opacity: .9; line-height: 1.55; }
     .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
     button, a.btn {
       appearance: none; border: 0; border-radius: 12px; padding: 12px 14px;
-      font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
+      font-weight: 800; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
     }
     .primary { background: #111; color: #fff; }
     .secondary { background: rgba(0,0,0,.08); color: #111; }
+    .run { background: #3F8EF7; color: #fff; }
     .small { font-size: 13px; opacity: .8; margin-top: 10px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 12px; opacity: .75; word-break: break-all; }
+
     @media (prefers-color-scheme: dark) {
       .card { border-color: rgba(255,255,255,.16); }
       .primary { background: #fff; color: #000; }
       .secondary { background: rgba(255,255,255,.12); color: #fff; }
+      .run { background: #3F8EF7; color: #fff; }
     }
   </style>
 </head>
@@ -43,110 +45,122 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>SevMenu 열기</h1>
-      <p id="subtitle">앱이 설치되어 있으면 자동으로 열립니다. 설치되어 있지 않다면 스토어로 안내합니다.</p>
+      <h1>세브메뉴 이용하기</h1>
 
-      <div class="row">
-        <button id="openBtn" class="primary">앱에서 열기</button>
-        <a id="storeBtn" class="btn secondary" href="#" rel="noopener">스토어로 이동</a>
-      </div>
+      <!-- 공통 본문 -->
+      <p id="commonText">
+        세브메뉴는 학생 프로젝트로 개발된 연세의료원 메뉴 앱입니다. 비영리 목적이나 앱 등록비용을 위해 부득이하게 광고가 있습니다.
+      </p>
+
+      <!-- 환경별 안내 문구 -->
+      <p id="subtitle"></p>
+
+      <!-- 버튼 영역(환경별로 구성) -->
+      <div class="row" id="buttons"></div>
 
       <p class="small" id="hint"></p>
-      <div class="mono" id="debug"></div>
+      <div class="mono" id="debug" style="display:none;"></div>
     </div>
   </div>
 
   <script>
-  const ANDROID_PACKAGE = "com.sev.menu";
-  const PLAY_STORE_URL  = "https://play.google.com/store/apps/details?id=" + encodeURIComponent(ANDROID_PACKAGE);
+    const ANDROID_PACKAGE = "com.sev.menu";
+    const PLAY_STORE_URL  = "https://play.google.com/store/apps/details?id=" + encodeURIComponent(ANDROID_PACKAGE);
+    const APP_STORE_URL   = "https://apps.apple.com/app/id6499293178";
 
-  const APP_STORE_URL   = "https://apps.apple.com/app/id6499293178";
+    // iOS 커스텀 스킴
+    const CUSTOM_SCHEME_PREFIX = "sevmenu://open";
 
-  // iOS용(커스텀 스킴)
-  const CUSTOM_SCHEME_PREFIX = "sevmenu://open";
+    const ua = navigator.userAgent || "";
+    const isAndroid = /Android/i.test(ua);
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
 
-  // App Links로 사용할 host (너는 github pages)
-  const BASE_HOST = "https://dorivan2001.github.io";
-
-  // 현재 랜딩 URL의 path/query/hash
-  const currentPath = location.pathname;               // e.g. "/" or "/something"
-  const currentTail = location.search + location.hash; // "?x=1#y"
-
-  const ua = navigator.userAgent || "";
-  const isAndroid = /Android/i.test(ua);
-  const isIOS = /iPhone|iPad|iPod/i.test(ua);
-
-  const storeBtn = document.getElementById("storeBtn");
-  storeBtn.href = isAndroid ? PLAY_STORE_URL : (isIOS ? APP_STORE_URL : PLAY_STORE_URL);
-
-  const subtitle = document.getElementById("subtitle");
-  if (isAndroid) subtitle.textContent = "안드로이드: 앱이 설치되어 있으면 열리고, 아니면 Play 스토어로 안내합니다.";
-  else if (isIOS) subtitle.textContent = "아이폰: 앱이 설치되어 있으면 열립니다. 미설치 시 App Store에서 설치해 주세요. (상단 배너가 보일 수 있어요)";
-  else subtitle.textContent = "모바일에서 열면 앱으로 연결됩니다.";
-
-  function buildAppLinkUrl() {
-    // 랜딩이 "/"일 때는 기본적으로 앱 홈으로 보내고,
-    // 이미 누군가가 특정 경로로 들어온 경우(예: /menu/123)라면 그 경로를 /app 밑으로 매핑
-    // 예:
-    //   /              -> /app/
-    //   /menu/123      -> /app/menu/123
-    //   /whatever?x=1  -> /app/whatever?x=1
-    const path = (currentPath === "/" ? "/app/" : ("/app" + currentPath));
-    return BASE_HOST + path + currentTail;
-  }
-
-  function tryOpenApp() {
-    const debug = document.getElementById("debug");
+    const subtitle = document.getElementById("subtitle");
+    const buttons = document.getElementById("buttons");
     const hint = document.getElementById("hint");
+    const debug = document.getElementById("debug");
 
-    if (isAndroid) {
-      // ✅ 가장 안정적: App Link URL로 이동 (설치되면 OS가 앱으로 전환)
-        // 현재 페이지가 "/"라면 app 홈으로, 아니면 현재 경로를 그대로 전달
-        const deepPath = (location.pathname === "/" ? "/app/" : ("/app" + location.pathname))
-                    + location.search + location.hash;
+    // OG url 채우기
+    const og = document.querySelector('meta[property="og:url"]');
+    if (og) og.setAttribute("content", location.href);
 
-  // intent:// 는 host가 필요해서 github host를 붙여주는 형태가 제일 안정적
-  const fallback = encodeURIComponent(PLAY_STORE_URL);
-
-  // intent://dorivan2001.github.io/app/...#Intent;scheme=https;package=...;S.browser_fallback_url=...;end
-  const intentUrl =
-    `intent://${"dorivan2001.github.io" + deepPath}` +
-    `#Intent;scheme=https;package=${ANDROID_PACKAGE};S.browser_fallback_url=${fallback};end`;
-
-  debug.textContent = "Android intent URL: " + intentUrl;
-  hint.textContent = "앱 열기를 시도 중입니다…";
-  location.href = intentUrl;
-  return;
-  //     const appLinkUrl = buildAppLinkUrl();
-  //     debug.textContent = "Android → open via App Link: " + appLinkUrl;
-  //     hint.textContent = "앱 열기를 시도 중입니다…";
-  //     location.href = appLinkUrl;
-  //     return;
+    function makeBtn({ id, text, href, onClick, cls }) {
+      if (href) {
+        const a = document.createElement("a");
+        a.id = id;
+        a.className = "btn " + (cls || "secondary");
+        a.href = href;
+        a.rel = "noopener";
+        a.textContent = text;
+        return a;
+      }
+      const b = document.createElement("button");
+      b.id = id;
+      b.className = cls || "primary";
+      b.textContent = text;
+      b.addEventListener("click", onClick);
+      return b;
     }
 
-    if (isIOS) {
-      // iOS는 Universal Links를 따로 구성한 경우엔 appLinkUrl을 써도 되고,
-      // 지금은 Smart App Banner + 커스텀 스킴 조합이므로 스킴으로 시도
-      const schemeUrl = CUSTOM_SCHEME_PREFIX + (currentPath === "/" ? "" : currentPath) + currentTail;
-      debug.textContent = "iOS → open via scheme: " + schemeUrl;
+    function openAndroidApp() {
+      // /app/*로 연결해 둔 상태 기준: 버튼 클릭 시 intent://로 즉시 실행 시도
+      const deepPath =
+        (location.pathname === "/" ? "/app/" : ("/app" + location.pathname)) +
+        location.search + location.hash;
+
+      const fallback = encodeURIComponent(PLAY_STORE_URL);
+
+      const intentUrl =
+        `intent://${"dorivan2001.github.io" + deepPath}` +
+        `#Intent;scheme=https;package=${ANDROID_PACKAGE};S.browser_fallback_url=${fallback};end`;
+
+      // debug.style.display = "block";
+      // debug.textContent = "Android intent URL: " + intentUrl;
+
+      hint.textContent = "앱 열기를 시도 중입니다…";
+      location.href = intentUrl;
+    }
+
+    function openIOSApp() {
+      const schemeUrl =
+        CUSTOM_SCHEME_PREFIX + (location.pathname === "/" ? "" : location.pathname) +
+        location.search + location.hash;
+
+      // debug.style.display = "block";
+      // debug.textContent = "iOS scheme URL: " + schemeUrl;
+
       hint.textContent = "앱 열기를 시도 중입니다…";
       location.href = schemeUrl;
 
       setTimeout(() => {
-        hint.textContent = "앱이 열리지 않으면 아래 '스토어로 이동'을 눌러 설치해 주세요.";
+        hint.textContent = "앱이 열리지 않으면 아래 '앱 다운받기'를 눌러 설치해 주세요.";
       }, 800);
-      return;
     }
 
-    hint.textContent = "모바일(안드로이드/아이폰)에서 열면 앱으로 연결됩니다.";
-    debug.textContent = "Current URL: " + location.href;
-  }
+    // 1) 데스크탑/기타(=모바일 아님)
+    if (!isAndroid && !isIOS) {
+      subtitle.textContent =
+        '모바일로 이용하시면 앱 접속 링크를 확인하실 수 있습니다. 아래 링크를 클릭하시면 앱스토어에 접속하실 수 있습니다';
 
-  document.getElementById("openBtn").addEventListener("click", tryOpenApp);
+      buttons.appendChild(makeBtn({ id: "androidBtn", text: "Android", href: PLAY_STORE_URL, cls: "secondary" }));
+      buttons.appendChild(makeBtn({ id: "appleBtn", text: "Apple", href: APP_STORE_URL, cls: "secondary" }));
+    }
 
-  // OG url 채우기
-  const og = document.querySelector('meta[property="og:url"]');
-  if (og) og.setAttribute("content", location.href);
-</script>
+    // 2) Android
+    if (isAndroid) {
+      subtitle.textContent = '아래 "앱 실행" 버튼을 클릭하면 세브메뉴가 실행됩니다.';
+
+      buttons.appendChild(makeBtn({ id: "runBtn", text: "앱 실행", onClick: openAndroidApp, cls: "run" }));
+      buttons.appendChild(makeBtn({ id: "dlBtn", text: "앱 다운받기", href: PLAY_STORE_URL, cls: "secondary" }));
+    }
+
+    // 3) iOS
+    if (isIOS) {
+      subtitle.textContent = '화면 상단에 "열기" 버튼 클릭.';
+
+      buttons.appendChild(makeBtn({ id: "dlBtn", text: "앱 다운받기", href: APP_STORE_URL, cls: "secondary" }));
+      // (원하면 iOS에도 실행 버튼을 추가할 수 있음. 지금 요구사항대로는 추가 안 함.)
+    }
+  </script>
 </body>
 </html>
