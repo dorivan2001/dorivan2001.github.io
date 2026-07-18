@@ -1,0 +1,47 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function validSeatStore(seatId, storeId) {
+      return
+        (seatId.matches('^A00[1-5]$') && storeId == 'main-foodcourt') ||
+        (seatId.matches('^B00[1-5]$') && storeId == 'woori-lounge') ||
+        (seatId.matches('^C00[1-5]$') && storeId == 'cancer-deli') ||
+        (seatId.matches('^D00[1-5]$') && storeId == 'general-cafe');
+    }
+
+    match /seats/{seatId} {
+      allow read: if true;
+      allow create, update: if signedIn()
+        && validSeatStore(seatId, request.resource.data.storeId)
+        && request.resource.data.keys().hasOnly([
+          'seatId', 'storeId', 'lastScanAt'
+        ])
+        && request.resource.data.seatId == seatId
+        && request.resource.data.lastScanAt == request.time;
+      allow delete: if false;
+    }
+
+    match /scanEvents/{eventId} {
+      allow read: if false;
+      allow create: if signedIn()
+        && validSeatStore(request.resource.data.seatId, request.resource.data.storeId)
+        && request.resource.data.keys().hasOnly([
+          'seatId', 'storeId', 'scannedAt', 'occupancyMinutes',
+          'source'
+        ])
+        && request.resource.data.scannedAt == request.time
+        && request.resource.data.occupancyMinutes == 50
+        && request.resource.data.source == 'qr';
+      allow update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
