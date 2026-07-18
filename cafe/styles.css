@@ -18,6 +18,17 @@ button{cursor:pointer}
 .page{display:none;min-height:720px;padding:31px 20px 42px;background:linear-gradient(#f3f9ff,#fff 270px)}
 .page.active{display:block}
 .page[data-page=home]{padding-top:0}
+.home-congestion{display:flex;align-items:center;gap:10px;padding:13px 20px;border-bottom:1px solid #e9eef3;background:#fff}
+.home-congestion .live-dot{flex:0 0 9px;width:9px;height:9px;border-radius:50%;background:#20a975;box-shadow:0 0 0 5px #20a97518}
+.home-congestion>div{min-width:0;display:flex;flex:1;flex-direction:column;gap:4px}
+.home-congestion small{color:#758596;font-size:8px;font-weight:800;letter-spacing:.7px}
+.congestion-store-line{min-width:0;display:flex;align-items:center;gap:8px}
+.congestion-store-line strong{overflow:hidden;font-size:13px;text-overflow:ellipsis;white-space:nowrap}
+.congestion-badge{flex:0 0 auto;padding:5px 9px;border-radius:999px;font-size:9px;font-style:normal;font-weight:850}
+.congestion-badge.loading{background:#edf1f4;color:#6f7c88}
+.congestion-badge.roomy{background:#e1f5eb;color:#168557}
+.congestion-badge.moderate{background:#fff2d8;color:#a96b00}
+.congestion-badge.busy{background:#ffe7e7;color:#c74747}
 .hero{position:relative;overflow:hidden;margin:0 -20px;padding:45px 27px 31px;background:linear-gradient(145deg,#e8f4ff,#fff)}
 .hero:after{content:"S";position:absolute;right:-16px;top:-34px;color:#0754a30c;font:bold 195px Georgia}
 .status-pill{position:relative;z-index:1;display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:99px;background:#dff3e9;color:#197653;font-size:10px;font-weight:800}

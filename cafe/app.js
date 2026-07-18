@@ -149,13 +149,36 @@ function availableSeatCount(){
   return storeSeats().filter(seat => !isOccupied(state.seatRecords.get(seat.id))).length;
 }
 
+function congestionStatus(available, total){
+  const occupancyPercent = total ? Math.round(((total - available) / total) * 100) : 0;
+  if(occupancyPercent >= 80){
+    return { label:"혼잡", tone:"busy", occupancyPercent };
+  }
+  if(occupancyPercent >= 40){
+    return { label:"보통", tone:"moderate", occupancyPercent };
+  }
+  return { label:"여유", tone:"roomy", occupancyPercent };
+}
+
 function renderSeats(){
   const available = availableSeatCount();
   const total = storeSeats().length;
   const percent = Math.round((available / total) * 100);
+  const congestion = state.lastSnapshotAt
+    ? congestionStatus(available, total)
+    : { label:"확인 중", tone:"loading", occupancyPercent:null };
   $$("[data-available-count]").forEach(element => { element.textContent = available; });
   $("#availabilityPercent").textContent = `${percent}%`;
   $("#donut").style.setProperty("--angle", `${percent * 3.6}deg`);
+  $("#seatCongestionLabel").textContent = congestion.label;
+  $("#homeCongestionBadge").textContent = congestion.label;
+  $("#homeCongestionBadge").className = `congestion-badge ${congestion.tone}`;
+  $("#homeCongestion").setAttribute(
+    "aria-label",
+    congestion.occupancyPercent === null
+      ? `${currentStore().name} 실시간 혼잡도 확인 중`
+      : `${currentStore().name} 실시간 혼잡도 ${congestion.label}, 점유율 ${congestion.occupancyPercent}%`
+  );
   $("#lastUpdated").textContent = state.lastSnapshotAt ? `${state.lastSnapshotAt.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})} 갱신` : "연결 중";
   $("#seatList").innerHTML = storeSeats().map(seat => {
     const record = state.seatRecords.get(seat.id);
