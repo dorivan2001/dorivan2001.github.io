@@ -29,7 +29,40 @@ setLogLevel("error");
 const params = new URLSearchParams(location.search);
 const qrSeatId = (params.get("seat") || "").toUpperCase();
 const qrSeat = seats.find(seat => seat.id === qrSeatId);
-const savedStore = localStorage.getItem("sevCafeStore");
+
+function readSavedStore(){
+  try{
+    return localStorage.getItem("sevCafeStore");
+  }catch{
+    return null;
+  }
+}
+
+function saveStore(storeId){
+  try{
+    localStorage.setItem("sevCafeStore", storeId);
+  }catch{
+    // 저장소가 차단돼도 현재 세션의 매장 변경은 계속 동작합니다.
+  }
+}
+
+function readLastLocalScan(key){
+  try{
+    return Number(sessionStorage.getItem(key) || 0);
+  }catch{
+    return 0;
+  }
+}
+
+function saveLastLocalScan(key){
+  try{
+    sessionStorage.setItem(key, String(Date.now()));
+  }catch{
+    // 저장소가 차단되면 로컬 중복 방지만 생략합니다.
+  }
+}
+
+const savedStore = readSavedStore();
 const initialStore = qrSeat?.storeId || (stores.some(store => store.id === savedStore) ? savedStore : stores[0].id);
 
 const state = {
@@ -75,14 +108,26 @@ function setConnection(message, type=""){
 function go(page){
   state.page = page;
   $$(".page").forEach(section => section.classList.toggle("active", section.dataset.page === page));
-  $$(".bottom-nav button").forEach(button => button.classList.toggle("active", button.dataset.go === page));
+  $$(".bottom-nav button").forEach(button => {
+    const active = button.dataset.go === page;
+    button.classList.toggle("active", active);
+    if(active){
+      button.setAttribute("aria-current", "page");
+    }else{
+      button.removeAttribute("aria-current");
+    }
+  });
   $("#backButton").style.visibility = page === "home" ? "hidden" : "visible";
   scrollTo({ top:0, behavior:"smooth" });
 }
 
 function selectStore(storeId){
+  const changed = state.storeId !== storeId;
   state.storeId = storeId;
-  localStorage.setItem("sevCafeStore", storeId);
+  saveStore(storeId);
+  if(changed){
+    $("#menuSearch").value = "";
+  }
   renderAll();
   $("#storeDialog").close();
 }
@@ -202,7 +247,7 @@ async function recordQrScan(){
   if(!qrSeat || state.scanStarted || !state.currentUser) return;
   state.scanStarted = true;
   const cooldownKey = `sevCafeScan:${qrSeat.id}`;
-  const lastLocalScan = Number(sessionStorage.getItem(cooldownKey) || 0);
+  const lastLocalScan = readLastLocalScan(cooldownKey);
   if(Date.now() - lastLocalScan < 60_000){
     $("#scanPill").classList.add("scanned");
     $("#scanPill").innerHTML = `<span>✓</span> ${qrSeat.id} 좌석이 이미 기록됐어요`;
@@ -226,7 +271,7 @@ async function recordQrScan(){
       source:"qr"
     });
     await batch.commit();
-    sessionStorage.setItem(cooldownKey,String(Date.now()));
+    saveLastLocalScan(cooldownKey);
     $("#scanPill").classList.add("scanned");
     $("#scanPill").innerHTML = `<span>✓</span> ${qrSeat.id} 이용 시작 · 50분`;
     showToast(`${qrSeat.id} 좌석이 50분간 이용 중으로 기록됐습니다.`);
@@ -260,4 +305,8 @@ onAuthStateChanged(auth, async user => {
 setInterval(renderSeats,30_000);
 renderAll();
 go("home");
+if(qrSeatId && !qrSeat){
+  $("#scanPill").classList.add("invalid");
+  $("#scanPill").innerHTML = `<span>!</span> 유효하지 않은 좌석 QR이에요`;
+}
 subscribeSeats();
