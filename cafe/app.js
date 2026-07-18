@@ -273,8 +273,8 @@ async function recordQrScan(){
     await batch.commit();
     saveLastLocalScan(cooldownKey);
     $("#scanPill").classList.add("scanned");
-    $("#scanPill").innerHTML = `<span>✓</span> ${qrSeat.id} 이용 시작 · 50분`;
-    showToast(`${qrSeat.id} 좌석이 50분간 이용 중으로 기록됐습니다.`);
+    $("#scanPill").innerHTML = `<span>✓</span> ${qrSeat.id} 이용 시작`;
+    showToast(`${qrSeat.id} 좌석이 이용 중으로 기록됐습니다.`);
   }catch(error){
     console.error(error);
     state.scanStarted = false;
