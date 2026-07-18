@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#003b78" />
-  <title>Severance ON · 카페 혼잡도와 메뉴</title>
+  <title>Severance Cafe · 카페 혼잡도와 메뉴</title>
   <meta name="description" content="세브란스 병원 카페의 QR 좌석 혼잡도와 메뉴 영양정보를 확인하세요." />
   <link rel="stylesheet" href="./styles.css" />
 </head>
@@ -12,21 +12,17 @@
   <main class="app">
     <header class="topbar">
       <button class="icon-button" id="backButton" aria-label="이전 화면">‹</button>
-      <button class="wordmark" data-go="home" aria-label="홈으로 이동"><span>S</span>Severance <em>ON</em></button>
+      <button class="wordmark" data-go="home" aria-label="홈으로 이동"><span>S</span>Severance <em>Cafe</em></button>
       <a class="app-link" href="../" aria-label="SevMenu 앱 페이지">SevMenu</a>
     </header>
 
     <div id="connectionBanner" class="connection-banner" role="status">Firebase 연결 확인 중</div>
 
     <section class="page active" data-page="home">
-      <div class="home-congestion" id="homeCongestion" role="status" aria-live="polite">
-        <span class="live-dot" aria-hidden="true"></span>
-        <div>
-          <small>실시간 혼잡도</small>
-          <span class="congestion-store-line">
-            <strong data-store-name>본관 푸드코트</strong>
-            <em class="congestion-badge loading" id="homeCongestionBadge">확인 중</em>
-          </span>
+      <div class="congestion-ticker" id="homeCongestion" role="status" aria-live="polite">
+        <span class="ticker-heading"><i class="live-dot" aria-hidden="true"></i>실시간 혼잡도</span>
+        <div class="ticker-window" aria-hidden="true">
+          <div class="ticker-track" id="congestionTickerTrack"></div>
         </div>
       </div>
 
@@ -39,7 +35,7 @@
 
       <button class="store-switcher" data-open-stores>
         <span class="store-icon">⌖</span>
-        <span><small>현재 보고 있는 매장</small><strong data-store-name>본관 푸드코트</strong></span>
+        <span><small>현재 보고 있는 매장</small><span class="store-current-line"><strong data-store-name>본관 푸드코트</strong><b class="congestion-badge loading" data-current-congestion>확인 중</b></span></span>
         <em>변경</em>
       </button>
 
@@ -71,7 +67,7 @@
 
       <button class="store-switcher" data-open-stores>
         <span class="store-icon">⌖</span>
-        <span><small>현재 보고 있는 매장</small><strong data-store-name>본관 푸드코트</strong></span>
+        <span><small>현재 보고 있는 매장</small><span class="store-current-line"><strong data-store-name>본관 푸드코트</strong><b class="congestion-badge loading" data-current-congestion>확인 중</b></span></span>
         <em>변경</em>
       </button>
 
@@ -101,7 +97,7 @@
 
       <button class="store-switcher" data-open-stores>
         <span class="store-icon">⌖</span>
-        <span><small>현재 보고 있는 매장</small><strong data-store-name>본관 푸드코트</strong></span>
+        <span><small>현재 보고 있는 매장</small><span class="store-current-line"><strong data-store-name>본관 푸드코트</strong><b class="congestion-badge loading" data-current-congestion>확인 중</b></span></span>
         <em>변경</em>
       </button>
 

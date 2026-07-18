@@ -18,12 +18,15 @@ button{cursor:pointer}
 .page{display:none;min-height:720px;padding:31px 20px 42px;background:linear-gradient(#f3f9ff,#fff 270px)}
 .page.active{display:block}
 .page[data-page=home]{padding-top:0}
-.home-congestion{display:flex;align-items:center;gap:10px;padding:13px 20px;border-bottom:1px solid #e9eef3;background:#fff}
-.home-congestion .live-dot{flex:0 0 9px;width:9px;height:9px;border-radius:50%;background:#20a975;box-shadow:0 0 0 5px #20a97518}
-.home-congestion>div{min-width:0;display:flex;flex:1;flex-direction:column;gap:4px}
-.home-congestion small{color:#758596;font-size:8px;font-weight:800;letter-spacing:.7px}
-.congestion-store-line{min-width:0;display:flex;align-items:center;gap:8px}
-.congestion-store-line strong{overflow:hidden;font-size:13px;text-overflow:ellipsis;white-space:nowrap}
+.congestion-ticker{height:46px;display:flex;align-items:center;overflow:hidden;border-bottom:1px solid #e9eef3;background:#fff}
+.ticker-heading{position:relative;z-index:2;align-self:stretch;display:flex;flex:0 0 auto;align-items:center;gap:8px;padding:0 13px 0 20px;background:#fff;color:#526476;font-size:9px;font-weight:850;letter-spacing:.2px;box-shadow:8px 0 14px #fff}
+.live-dot{flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:#20a975;box-shadow:0 0 0 4px #20a97518}
+.ticker-window{min-width:0;flex:1;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.ticker-track{display:flex;width:max-content;will-change:transform;animation:congestion-ticker 24s linear infinite}
+.ticker-group{display:flex;align-items:center;gap:22px;padding-right:22px}
+.ticker-item{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.ticker-item strong{font-size:10px}
+@keyframes congestion-ticker{to{transform:translateX(-50%)}}
 .congestion-badge{flex:0 0 auto;padding:5px 9px;border-radius:999px;font-size:9px;font-style:normal;font-weight:850}
 .congestion-badge.loading{background:#edf1f4;color:#6f7c88}
 .congestion-badge.roomy{background:#e1f5eb;color:#168557}
@@ -45,6 +48,9 @@ button{cursor:pointer}
 .store-switcher>span:nth-child(2){display:flex;flex-direction:column;gap:3px}
 .store-switcher small{color:#8793a0;font-size:9px}
 .store-switcher strong{font-size:13px}
+.store-current-line{min-width:0;display:flex;align-items:center;gap:7px}
+.store-current-line strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.store-current-line .congestion-badge{padding:4px 8px;font-size:8px}
 .store-switcher em{padding:7px 10px;border:1px solid #cfdeea;border-radius:9px;color:var(--navy);font-size:10px;font-style:normal;font-weight:800}
 .feature-grid{display:grid;gap:12px}
 .feature-card{min-height:128px;display:grid;grid-template-columns:50px 1fr 32px;align-items:center;gap:13px;padding:19px;border:0;border-radius:23px;text-align:left}
@@ -114,6 +120,9 @@ button{cursor:pointer}
 .store-option.active{padding-inline:10px;border-radius:13px;background:#f1f7fd}
 .store-option>span:first-child{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#e7f2fc}
 .store-option>span:nth-child(2){display:flex;flex-direction:column;gap:4px}
+.store-option-title{min-width:0;display:flex;align-items:center;gap:7px}
+.store-option-title strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.store-option-title .congestion-badge{padding:4px 8px;font-size:8px}
 .store-option strong{font-size:12px}.store-option small{color:#7f8b97;font-size:8px}
 .menu-sheet{max-height:88vh}
 .nutrition-hero{display:flex;align-items:center;gap:13px;padding:15px;border-radius:18px;background:#edf7ff}
@@ -135,4 +144,4 @@ button{cursor:pointer}
 .toast{position:fixed;left:50%;bottom:88px;z-index:30;max-width:calc(100% - 40px);padding:12px 15px;border-radius:13px;background:#152638;color:#fff;font-size:10px;box-shadow:var(--shadow);opacity:0;transform:translate(-50%,12px);pointer-events:none;transition:.25s}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 @media(min-width:600px){.app{margin:25px auto;min-height:calc(100vh - 50px);border-radius:32px;overflow:hidden}.bottom-nav{bottom:25px;border-radius:0 0 32px 32px}.sheet{margin:auto;border-radius:25px}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}.ticker-track{animation:none}.ticker-window{overflow:auto}}

@@ -77,7 +77,8 @@ const state = {
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const currentStore = () => stores.find(store => store.id === state.storeId);
-const storeSeats = () => seats.filter(seat => seat.storeId === state.storeId);
+const seatsForStore = storeId => seats.filter(seat => seat.storeId === storeId);
+const storeSeats = () => seatsForStore(state.storeId);
 const recordDate = record => record?.lastScanAt?.toDate ? record.lastScanAt.toDate() : null;
 const occupiedUntil = record => {
   const scannedAt = recordDate(record);
@@ -135,18 +136,25 @@ function selectStore(storeId){
 function renderStores(){
   const store = currentStore();
   $$("[data-store-name]").forEach(element => { element.textContent = store.name; });
-  $("#storeList").innerHTML = stores.map(item => `
-    <button type="button" class="store-option ${item.id === state.storeId ? "active" : ""}" data-store-id="${item.id}">
-      <span>⌂</span>
-      <span><strong>${item.name}</strong><small>${item.location} · ${item.brand}</small></span>
-      <em>${item.id === state.storeId ? "✓" : "→"}</em>
-    </button>
-  `).join("");
+  $("#storeList").innerHTML = stores.map(item => {
+    const congestion = congestionForStore(item.id);
+    return `
+      <button type="button" class="store-option ${item.id === state.storeId ? "active" : ""}" data-store-id="${item.id}">
+        <span>⌂</span>
+        <span><span class="store-option-title"><strong>${item.name}</strong><b class="congestion-badge ${congestion.tone}">${congestion.label}</b></span><small>${item.location} · ${item.brand}</small></span>
+        <em>${item.id === state.storeId ? "✓" : "→"}</em>
+      </button>
+    `;
+  }).join("");
   $$("[data-store-id]").forEach(button => button.addEventListener("click", () => selectStore(button.dataset.storeId)));
 }
 
+function availableSeatCountFor(storeId){
+  return seatsForStore(storeId).filter(seat => !isOccupied(state.seatRecords.get(seat.id))).length;
+}
+
 function availableSeatCount(){
-  return storeSeats().filter(seat => !isOccupied(state.seatRecords.get(seat.id))).length;
+  return availableSeatCountFor(state.storeId);
 }
 
 function congestionStatus(available, total){
@@ -160,24 +168,38 @@ function congestionStatus(available, total){
   return { label:"여유", tone:"roomy", occupancyPercent };
 }
 
+function congestionForStore(storeId){
+  const storeSeatList = seatsForStore(storeId);
+  if(!state.lastSnapshotAt){
+    return { label:"확인 중", tone:"loading", occupancyPercent:null };
+  }
+  return congestionStatus(availableSeatCountFor(storeId), storeSeatList.length);
+}
+
 function renderSeats(){
   const available = availableSeatCount();
   const total = storeSeats().length;
   const percent = Math.round((available / total) * 100);
-  const congestion = state.lastSnapshotAt
-    ? congestionStatus(available, total)
-    : { label:"확인 중", tone:"loading", occupancyPercent:null };
+  const congestion = congestionForStore(state.storeId);
   $$("[data-available-count]").forEach(element => { element.textContent = available; });
   $("#availabilityPercent").textContent = `${percent}%`;
   $("#donut").style.setProperty("--angle", `${percent * 3.6}deg`);
   $("#seatCongestionLabel").textContent = congestion.label;
-  $("#homeCongestionBadge").textContent = congestion.label;
-  $("#homeCongestionBadge").className = `congestion-badge ${congestion.tone}`;
+  $$("[data-current-congestion]").forEach(element => {
+    element.textContent = congestion.label;
+    element.className = `congestion-badge ${congestion.tone}`;
+  });
+  const tickerItems = stores.map(store => {
+    const storeCongestion = congestionForStore(store.id);
+    return `<span class="ticker-item"><strong>${store.name}</strong><em class="congestion-badge ${storeCongestion.tone}">${storeCongestion.label}</em></span>`;
+  }).join("");
+  $("#congestionTickerTrack").innerHTML = `<span class="ticker-group">${tickerItems}</span><span class="ticker-group" aria-hidden="true">${tickerItems}</span>`;
   $("#homeCongestion").setAttribute(
     "aria-label",
-    congestion.occupancyPercent === null
-      ? `${currentStore().name} 실시간 혼잡도 확인 중`
-      : `${currentStore().name} 실시간 혼잡도 ${congestion.label}, 점유율 ${congestion.occupancyPercent}%`
+    `실시간 혼잡도: ${stores.map(store => {
+      const storeCongestion = congestionForStore(store.id);
+      return `${store.name} ${storeCongestion.label}`;
+    }).join(", ")}`
   );
   $("#lastUpdated").textContent = state.lastSnapshotAt ? `${state.lastSnapshotAt.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})} 갱신` : "연결 중";
   $("#seatList").innerHTML = storeSeats().map(seat => {
@@ -259,6 +281,7 @@ function subscribeSeats(){
     snapshot.forEach(document => state.seatRecords.set(document.id, document.data()));
     state.lastSnapshotAt = new Date();
     setConnection("실시간 좌석 정보 연결됨","connected");
+    renderStores();
     renderSeats();
   }, error => {
     console.error(error);
@@ -325,7 +348,10 @@ onAuthStateChanged(auth, async user => {
   }
 });
 
-setInterval(renderSeats,30_000);
+setInterval(() => {
+  renderStores();
+  renderSeats();
+},30_000);
 renderAll();
 go("home");
 if(qrSeatId && !qrSeat){

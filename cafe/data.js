@@ -4,7 +4,7 @@ export const stores = [
   { id:"main-foodcourt", code:"A", name:"본관 푸드코트", brand:"투썸플레이스", location:"본관 3층", seatPrefix:"A", description:"투썸플레이스 대표 음료를 만나는 파일럿 공간" },
   { id:"woori-lounge", code:"B", name:"우리라운지", brand:"파스쿠찌", location:"본관 2층", seatPrefix:"B", description:"파스쿠찌 커피와 함께 쉬어가는 라운지" },
   { id:"cancer-deli", code:"C", name:"암병원 델리", brand:"파리크라상", location:"암병원 지하 1층", seatPrefix:"C", description:"파리크라상 카페 메뉴를 제공하는 델리 공간" },
-  { id:"general-cafe", code:"D", name:"종합관 카페", brand:"이디야", location:"종합관 1층", seatPrefix:"D", description:"이디야 대표 음료를 만나는 종합관 카페" }
+  { id:"general-cafe", code:"D", name:"종합관 카페", brand:"이디야", location:"종합관 2층", seatPrefix:"D", description:"이디야 대표 음료를 만나는 종합관 카페" }
 ];
 
 export const seats = stores.flatMap(store =>
