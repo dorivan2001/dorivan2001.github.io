@@ -20,7 +20,7 @@
 
     <section class="page active" data-page="home">
       <div class="hero">
-        <div class="status-pill" id="scanPill"><span>✓</span> QR 좌석 서비스를 준비했어요</div>
+        <div class="status-pill" id="scanPill" role="status" aria-live="polite"><span>✓</span> QR 좌석 서비스를 준비했어요</div>
         <p class="eyebrow">SMART HOSPITAL LIFE</p>
         <h1>병원 안의 시간을<br><em>조금 더 편안하게.</em></h1>
         <p>실시간 좌석과 카페 메뉴 영양정보를 한눈에 확인하세요.</p>
@@ -96,27 +96,27 @@
 
       <label class="search-field">
         <span>⌕</span>
-        <input id="menuSearch" type="search" placeholder="메뉴 이름 검색" autocomplete="off" />
+        <input id="menuSearch" type="search" placeholder="메뉴 이름 검색" aria-label="메뉴 이름 검색" autocomplete="off" />
       </label>
       <div class="menu-list" id="menuList"></div>
     </section>
 
     <nav class="bottom-nav" aria-label="주요 메뉴">
-      <button class="active" data-go="home"><span>⌂</span>홈</button>
+      <button class="active" data-go="home" aria-current="page"><span>⌂</span>홈</button>
       <button data-go="seats"><span>⌑</span>좌석</button>
       <button data-go="menu"><span>♨</span>메뉴</button>
     </nav>
   </main>
 
-  <dialog id="storeDialog" class="sheet">
+  <dialog id="storeDialog" class="sheet" aria-labelledby="storeDialogTitle">
     <form method="dialog">
       <div class="sheet-handle"></div>
-      <div class="sheet-title"><div><small>SELECT STORE</small><h2>매장 변경</h2></div><button value="cancel" aria-label="닫기">×</button></div>
+      <div class="sheet-title"><div><small>SELECT STORE</small><h2 id="storeDialogTitle">매장 변경</h2></div><button value="cancel" aria-label="닫기">×</button></div>
       <div class="store-list" id="storeList"></div>
     </form>
   </dialog>
 
-  <dialog id="menuDialog" class="sheet menu-sheet">
+  <dialog id="menuDialog" class="sheet menu-sheet" aria-labelledby="menuTitle">
     <form method="dialog">
       <div class="sheet-handle"></div>
       <div class="sheet-title"><div><small id="menuBrand">MENU DETAIL</small><h2 id="menuTitle">메뉴</h2></div><button value="cancel" aria-label="닫기">×</button></div>
@@ -124,7 +124,7 @@
     </form>
   </dialog>
 
-  <dialog id="seatDialog" class="sheet">
+  <dialog id="seatDialog" class="sheet" aria-labelledby="seatDialogTitle">
     <form method="dialog">
       <div class="sheet-handle"></div>
       <div class="sheet-title"><div><small>SEAT STATUS</small><h2 id="seatDialogTitle">A001</h2></div><button value="cancel" aria-label="닫기">×</button></div>
