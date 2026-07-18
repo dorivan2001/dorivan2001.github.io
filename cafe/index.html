@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#003b78" />
+  <title>Severance ON · 카페 혼잡도와 메뉴</title>
+  <meta name="description" content="세브란스 병원 카페의 QR 좌석 혼잡도와 메뉴 영양정보를 확인하세요." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <button class="icon-button" id="backButton" aria-label="이전 화면">‹</button>
+      <button class="wordmark" data-go="home" aria-label="홈으로 이동"><span>S</span>Severance <em>ON</em></button>
+      <a class="app-link" href="../" aria-label="SevMenu 앱 페이지">SevMenu</a>
+    </header>
+
+    <div id="connectionBanner" class="connection-banner" role="status">Firebase 연결 확인 중</div>
+
+    <section class="page active" data-page="home">
+      <div class="hero">
+        <div class="status-pill" id="scanPill"><span>✓</span> QR 좌석 서비스를 준비했어요</div>
+        <p class="eyebrow">SMART HOSPITAL LIFE</p>
+        <h1>병원 안의 시간을<br><em>조금 더 편안하게.</em></h1>
+        <p>실시간 좌석과 카페 메뉴 영양정보를 한눈에 확인하세요.</p>
+      </div>
+
+      <button class="store-switcher" data-open-stores>
+        <span class="store-icon">⌖</span>
+        <span><small>현재 보고 있는 매장</small><strong data-store-name>본관 푸드코트</strong></span>
+        <em>변경</em>
+      </button>
+
+      <div class="feature-grid">
+        <button class="feature-card seats-card" data-go="seats">
+          <span class="feature-icon">⌑</span>
+          <span><small>LIVE SEAT</small><strong>실시간 혼잡도</strong><p><b data-available-count>5</b>석 이용 가능</p></span>
+          <em>→</em>
+        </button>
+        <button class="feature-card menu-card" data-go="menu">
+          <span class="feature-icon">♨</span>
+          <span><small>MENU & NUTRITION</small><strong>메뉴 영양정보</strong><p>브랜드 대표 메뉴 10개</p></span>
+          <em>→</em>
+        </button>
+      </div>
+
+      <aside class="notice-card">
+        <span>i</span>
+        <div><strong>QR 이용 안내</strong><p>좌석 QR을 열면 해당 좌석이 50분간 이용 중으로 표시됩니다. 다시 열면 마지막 스캔 시점부터 50분으로 연장됩니다.</p></div>
+      </aside>
+    </section>
+
+    <section class="page" data-page="seats">
+      <div class="section-title">
+        <p>LIVE SEAT</p>
+        <h1>좌석 이용 현황</h1>
+        <span>QR 기록을 기준으로 실시간 갱신됩니다.</span>
+      </div>
+
+      <button class="store-switcher" data-open-stores>
+        <span class="store-icon">⌖</span>
+        <span><small>현재 보고 있는 매장</small><strong data-store-name>본관 푸드코트</strong></span>
+        <em>변경</em>
+      </button>
+
+      <div class="occupancy-card">
+        <div><small>현재 이용 가능</small><strong><b data-available-count>5</b><i>석</i></strong><p>전체 5석 · <span id="lastUpdated">연결 중</span></p></div>
+        <div class="donut" id="donut"><span id="availabilityPercent">100%</span><small>여유</small></div>
+      </div>
+
+      <div class="legend"><span><i class="available"></i>이용 가능</span><span><i class="occupied"></i>이용 중</span></div>
+
+      <section class="seat-panel">
+        <div class="seat-panel-head">
+          <div><small data-store-code>A ZONE</small><strong data-store-name>본관 푸드코트</strong></div>
+          <span>QR PILOT · 5 SEATS</span>
+        </div>
+        <div class="seat-list" id="seatList"></div>
+        <p class="seat-help">좌석을 누르면 해당 QR 주소를 확인할 수 있습니다.</p>
+      </section>
+    </section>
+
+    <section class="page" data-page="menu">
+      <div class="section-title">
+        <p>MENU & NUTRITION</p>
+        <h1>메뉴 정보</h1>
+        <span>공식 공개 영양정보만 표시합니다.</span>
+      </div>
+
+      <button class="store-switcher" data-open-stores>
+        <span class="store-icon">⌖</span>
+        <span><small>현재 보고 있는 매장</small><strong data-store-name>본관 푸드코트</strong></span>
+        <em>변경</em>
+      </button>
+
+      <label class="search-field">
+        <span>⌕</span>
+        <input id="menuSearch" type="search" placeholder="메뉴 이름 검색" autocomplete="off" />
+      </label>
+      <div class="menu-list" id="menuList"></div>
+    </section>
+
+    <nav class="bottom-nav" aria-label="주요 메뉴">
+      <button class="active" data-go="home"><span>⌂</span>홈</button>
+      <button data-go="seats"><span>⌑</span>좌석</button>
+      <button data-go="menu"><span>♨</span>메뉴</button>
+    </nav>
+  </main>
+
+  <dialog id="storeDialog" class="sheet">
+    <form method="dialog">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title"><div><small>SELECT STORE</small><h2>매장 변경</h2></div><button value="cancel" aria-label="닫기">×</button></div>
+      <div class="store-list" id="storeList"></div>
+    </form>
+  </dialog>
+
+  <dialog id="menuDialog" class="sheet menu-sheet">
+    <form method="dialog">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title"><div><small id="menuBrand">MENU DETAIL</small><h2 id="menuTitle">메뉴</h2></div><button value="cancel" aria-label="닫기">×</button></div>
+      <div id="menuDetail"></div>
+    </form>
+  </dialog>
+
+  <dialog id="seatDialog" class="sheet">
+    <form method="dialog">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title"><div><small>QR SEAT</small><h2 id="seatDialogTitle">A001</h2></div><button value="cancel" aria-label="닫기">×</button></div>
+      <p class="dialog-copy">아래 주소로 만든 QR을 좌석에 부착합니다. QR을 열면 해당 좌석의 이용 시간이 기록됩니다.</p>
+      <code id="seatUrl"></code>
+      <button type="button" class="copy-button" id="copySeatUrl">주소 복사</button>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

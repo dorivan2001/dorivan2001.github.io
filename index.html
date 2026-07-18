@@ -2,187 +2,125 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>세브메뉴 이용하기</title>
-  <meta name="description" content="세브메뉴 이용하기" />
-
-  <!-- iOS Smart App Banner -->
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>SevMenu 열기</title>
+  <meta name="description" content="SevMenu 앱을 열거나 세브란스 카페 혼잡도와 메뉴를 확인하세요." />
   <meta name="apple-itunes-app" content="app-id=6499293178, app-argument=sevmenu://open" />
-
-  <!-- 공유용(Open Graph) -->
-  <meta property="og:title" content="세브메뉴 이용하기" />
-  <meta property="og:description" content="세브메뉴는 학생 프로젝트로 개발된 연세의료원 메뉴 앱입니다." />
+  <meta property="og:title" content="SevMenu" />
+  <meta property="og:description" content="병원 식단과 카페 정보를 한곳에서 확인하세요." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="" />
-
   <style>
-    :root { color-scheme: light dark; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif; margin: 0; }
-    .wrap { max-width: 720px; margin: 0 auto; padding: 24px; }
-    .card { border: 1px solid rgba(0,0,0,.12); border-radius: 16px; padding: 20px; }
-    h1 { margin: 0 0 10px; font-size: 22px; }
-    p  { margin: 0 0 12px; opacity: .9; line-height: 1.55; }
-    .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
-    button, a.btn {
-        -webkit-appearance: none;
-  appearance: none;
-
-  border: 0;
-  border-radius: 12px;
-  padding: 12px 14px;
-
-  /* ✅ 폰트 완전 통일(안드로이드에서 특히 효과 큼) */
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: 0;
-
-  cursor: pointer;
-  text-decoration: none;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  /* ✅ 버튼의 기본 min-height/텍스트 렌더링 차이 방지 */
-  white-space: nowrap;
-    }
-    .primary { background: #111; color: #fff; }
-    .secondary { background: rgba(0,0,0,.08); color: #111; }
-    .run { background: #3F8EF7; color: #fff; }
-    .small { font-size: 13px; opacity: .8; margin-top: 10px; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 12px; opacity: .75; word-break: break-all; }
-
-    @media (prefers-color-scheme: dark) {
-      .card { border-color: rgba(255,255,255,.16); }
-      .primary { background: #fff; color: #000; }
-      .secondary { background: rgba(255,255,255,.12); color: #fff; }
-      .run { background: #3F8EF7; color: #fff; }
-    }
-
+    :root{--navy:#003b78;--blue:#0871cf;--pale:#eef7ff;--ink:#172638;--muted:#6f7f90;--line:#dce6ef}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:#e4edf5;color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
+    .shell{width:min(100%,720px);min-height:100vh;margin:auto;background:#fff}
+    header{height:72px;display:flex;align-items:center;padding:0 24px;border-bottom:1px solid #edf1f4}
+    .brand{display:flex;align-items:center;gap:10px;color:var(--navy);font-weight:850;letter-spacing:-.4px}
+    .brand-mark{display:grid;place-items:center;width:31px;height:31px;border-radius:10px 4px 10px 4px;background:var(--navy);color:#fff;font:italic 20px Georgia}
+    main{padding:36px 22px 56px;background:linear-gradient(160deg,#edf7ff 0,#fff 42%)}
+    .eyebrow{margin:0 0 12px;color:var(--blue);font-size:12px;font-weight:800;letter-spacing:1.6px}
+    h1{margin:0;font-size:clamp(34px,8vw,52px);line-height:1.16;letter-spacing:-2px}
+    .lead{margin:18px 0 30px;color:var(--muted);line-height:1.7}
+    .grid{display:grid;gap:14px}
+    .card{padding:23px;border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 35px #003b7810}
+    .card.cafe{background:linear-gradient(135deg,#00366d,#0868c8);color:#fff;border:0}
+    .card small{display:block;margin-bottom:8px;font-size:10px;font-weight:800;letter-spacing:1.3px;opacity:.72}
+    .card h2{margin:0 0 8px;font-size:22px}
+    .card p{margin:0 0 20px;font-size:14px;line-height:1.55;opacity:.76}
+    .actions{display:flex;gap:9px;flex-wrap:wrap}
+    button,.button{border:0;border-radius:13px;padding:13px 16px;font:inherit;font-size:14px;font-weight:800;cursor:pointer;text-decoration:none}
+    [hidden]{display:none!important}
+    .primary{background:var(--navy);color:#fff}
+    .secondary{background:var(--pale);color:var(--navy)}
+    .cafe .button{background:#fff;color:var(--navy)}
+    #hint{margin:12px 0 0;color:var(--muted);font-size:12px;line-height:1.55}
+    footer{padding:22px;text-align:center;color:#94a0ac;font-size:11px;background:#f6f8fa}
+    @media(min-width:620px){.shell{margin:24px auto;min-height:calc(100vh - 48px);border-radius:30px;overflow:hidden}.grid{grid-template-columns:1.12fr .88fr}}
   </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>세브메뉴 이용하기</h1>
-
-      <!-- 공통 본문 -->
-      <p id="commonText">
-        세브메뉴는 학생 프로젝트로 개발된 연세의료원 메뉴 앱입니다.
-      </p>
-
-      <!-- 환경별 안내 문구 -->
-      <p id="subtitle"></p>
-
-      <!-- 버튼 영역(환경별로 구성) -->
-      <div class="row" id="buttons"></div>
-
-      <p class="small" id="hint"></p>
-      <div class="mono" id="debug" style="display:none;"></div>
-    </div>
+  <div class="shell">
+    <header><div class="brand"><span class="brand-mark">S</span>SevMenu</div></header>
+    <main>
+      <p class="eyebrow">SMART HOSPITAL LIFE</p>
+      <h1>병원 안의 식사와 휴식,<br>조금 더 편안하게.</h1>
+      <p class="lead">SevMenu 앱을 열거나, 새로 추가된 카페 좌석 혼잡도와 메뉴 영양정보를 확인하세요.</p>
+      <div class="grid">
+        <section class="card cafe">
+          <small>SEVERANCE CAFE</small>
+          <h2>카페 혼잡도 · 메뉴</h2>
+          <p>QR 좌석 현황과 4개 카페의 대표 메뉴 영양정보를 실시간으로 확인합니다.</p>
+          <a class="button" href="./cafe/">카페 정보 보기 →</a>
+        </section>
+        <section class="card">
+          <small>SEVMENU APP</small>
+          <h2>앱에서 열기</h2>
+          <p id="subtitle">앱이 설치되어 있으면 바로 열고, 없다면 스토어로 안내합니다.</p>
+          <div class="actions">
+            <button id="openBtn" class="primary" hidden>앱 실행</button>
+            <a id="androidBtn" class="button secondary" href="#" rel="noopener" hidden>Android</a>
+            <a id="appleBtn" class="button secondary" href="#" rel="noopener" hidden>iOS</a>
+          </div>
+          <p id="hint" aria-live="polite"></p>
+        </section>
+      </div>
+    </main>
+    <footer>SEVERANCE HOSPITAL · 건강한 병원 생활을 연결합니다.</footer>
   </div>
-
   <script>
     const ANDROID_PACKAGE = "com.sev.menu";
-    const PLAY_STORE_URL  = "https://play.google.com/store/apps/details?id=" + encodeURIComponent(ANDROID_PACKAGE);
-    const APP_STORE_URL   = "https://apps.apple.com/app/id6499293178";
-
-    // iOS 커스텀 스킴
+    const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=" + encodeURIComponent(ANDROID_PACKAGE);
+    const APP_STORE_URL = "https://apps.apple.com/app/id6499293178";
     const CUSTOM_SCHEME_PREFIX = "sevmenu://open";
-
     const ua = navigator.userAgent || "";
     const isAndroid = /Android/i.test(ua);
     const isIOS = /iPhone|iPad|iPod/i.test(ua);
-
     const subtitle = document.getElementById("subtitle");
-    const buttons = document.getElementById("buttons");
+    const openBtn = document.getElementById("openBtn");
+    const androidBtn = document.getElementById("androidBtn");
+    const appleBtn = document.getElementById("appleBtn");
     const hint = document.getElementById("hint");
-    const debug = document.getElementById("debug");
+    androidBtn.href = PLAY_STORE_URL;
+    appleBtn.href = APP_STORE_URL;
 
-    // OG url 채우기
-    const og = document.querySelector('meta[property="og:url"]');
-    if (og) og.setAttribute("content", location.href);
-
-    function makeBtn({ id, text, href, onClick, cls }) {
-      if (href) {
-        const a = document.createElement("a");
-        a.id = id;
-        a.className = "btn " + (cls || "secondary");
-        a.href = href;
-        a.rel = "noopener";
-        a.textContent = text;
-        return a;
+    function tryOpenApp(){
+      if(isAndroid){
+        const deepPath =
+          (location.pathname === "/" ? "/app/" : ("/app" + location.pathname)) +
+          location.search + location.hash;
+        const fallback = encodeURIComponent(PLAY_STORE_URL);
+        location.href =
+          `intent://${"dorivan2001.github.io" + deepPath}` +
+          `#Intent;scheme=https;package=${ANDROID_PACKAGE};S.browser_fallback_url=${fallback};end`;
+        hint.textContent = "앱 열기를 시도하고 있습니다.";
+        return;
       }
-      const b = document.createElement("button");
-      b.id = id;
-      b.className = cls || "primary";
-      b.textContent = text;
-      b.addEventListener("click", onClick);
-      return b;
+      if(isIOS){
+        location.href =
+          CUSTOM_SCHEME_PREFIX + (location.pathname === "/" ? "" : location.pathname) +
+          location.search + location.hash;
+        setTimeout(()=>{ hint.textContent = "앱이 열리지 않으면 iOS 버튼을 눌러 설치해 주세요."; },800);
+        return;
+      }
+      hint.textContent = "모바일에서 접속하면 SevMenu 앱으로 연결할 수 있습니다.";
     }
 
-    function openAndroidApp() {
-      // /app/*로 연결해 둔 상태 기준: 버튼 클릭 시 intent://로 즉시 실행 시도
-      const deepPath =
-        (location.pathname === "/" ? "/app/" : ("/app" + location.pathname)) +
-        location.search + location.hash;
-
-      const fallback = encodeURIComponent(PLAY_STORE_URL);
-
-      const intentUrl =
-        `intent://${"dorivan2001.github.io" + deepPath}` +
-        `#Intent;scheme=https;package=${ANDROID_PACKAGE};S.browser_fallback_url=${fallback};end`;
-
-      // debug.style.display = "block";
-      // debug.textContent = "Android intent URL: " + intentUrl;
-
-      hint.textContent = "세브메뉴를 실행합니다.";
-      location.href = intentUrl;
+    if(isAndroid){
+      subtitle.textContent = '아래 "앱 실행" 버튼을 누르면 SevMenu가 실행됩니다.';
+      openBtn.hidden = false;
+      androidBtn.hidden = false;
+    }else if(isIOS){
+      subtitle.textContent = 'Safari 상단의 "열기" 버튼으로 실행하거나 App Store에서 설치할 수 있습니다.';
+      appleBtn.hidden = false;
+    }else{
+      subtitle.textContent = "모바일에서 앱을 실행할 수 있습니다. 사용하는 기기의 스토어를 선택해 주세요.";
+      androidBtn.hidden = false;
+      appleBtn.hidden = false;
     }
 
-    function openIOSApp() {
-      const schemeUrl =
-        CUSTOM_SCHEME_PREFIX + (location.pathname === "/" ? "" : location.pathname) +
-        location.search + location.hash;
-
-      // debug.style.display = "block";
-      // debug.textContent = "iOS scheme URL: " + schemeUrl;
-
-      hint.textContent = "세브메뉴를 실행합니다.";
-      location.href = schemeUrl;
-
-      setTimeout(() => {
-        hint.textContent = "앱이 열리지 않으면 아래 '앱 다운받기'를 눌러 설치해 주세요.";
-      }, 800);
-    }
-
-    // 1) 데스크탑/기타(=모바일 아님)
-    if (!isAndroid && !isIOS) {
-      subtitle.textContent =
-        '모바일로 이용하시면 앱 접속 링크를 확인하실 수 있습니다. 아래 링크를 클릭하시면 앱스토어에 접속하실 수 있습니다.';
-
-      buttons.appendChild(makeBtn({ id: "androidBtn", text: "Android", href: PLAY_STORE_URL, cls: "secondary" }));
-      buttons.appendChild(makeBtn({ id: "appleBtn", text: "iOS", href: APP_STORE_URL, cls: "secondary" }));
-    }
-
-    // 2) Android
-    if (isAndroid) {
-      subtitle.textContent = '아래 "앱 실행" 버튼을 클릭하면 세브메뉴가 실행됩니다.';
-
-      buttons.appendChild(makeBtn({ id: "runBtn", text: "앱 실행", onClick: openAndroidApp, cls: "run" }));
-      buttons.appendChild(makeBtn({ id: "dlBtn", text: "앱 다운받기", href: PLAY_STORE_URL, cls: "secondary" }));
-    }
-
-    // 3) iOS
-    if (isIOS) {
-      subtitle.textContent = 'Safari로 실행하여 화면 상단 "열기" 버튼을 클릭하면 세브메뉴로 연결됩니다.';
-
-      buttons.appendChild(makeBtn({ id: "dlBtn", text: "앱 다운받기", href: APP_STORE_URL, cls: "secondary" }));
-      // (원하면 iOS에도 실행 버튼을 추가할 수 있음. 지금 요구사항대로는 추가 안 함.)
-    }
+    openBtn.addEventListener("click",tryOpenApp);
+    document.querySelector('meta[property="og:url"]').content = location.href;
   </script>
 </body>
 </html>
