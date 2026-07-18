@@ -73,11 +73,11 @@
 
       <section class="seat-panel">
         <div class="seat-panel-head">
-          <div><small data-store-code>A ZONE</small><strong data-store-name>본관 푸드코트</strong></div>
+          <strong data-store-name>본관 푸드코트</strong>
           <span>QR PILOT · 5 SEATS</span>
         </div>
         <div class="seat-list" id="seatList"></div>
-        <p class="seat-help">좌석을 누르면 해당 QR 주소를 확인할 수 있습니다.</p>
+        <p class="seat-help">좌석을 누르면 마지막 갱신 시간을 확인할 수 있습니다.</p>
       </section>
     </section>
 
@@ -127,10 +127,13 @@
   <dialog id="seatDialog" class="sheet">
     <form method="dialog">
       <div class="sheet-handle"></div>
-      <div class="sheet-title"><div><small>QR SEAT</small><h2 id="seatDialogTitle">A001</h2></div><button value="cancel" aria-label="닫기">×</button></div>
-      <p class="dialog-copy">아래 주소로 만든 QR을 좌석에 부착합니다. QR을 열면 해당 좌석의 이용 시간이 기록됩니다.</p>
-      <code id="seatUrl"></code>
-      <button type="button" class="copy-button" id="copySeatUrl">주소 복사</button>
+      <div class="sheet-title"><div><small>SEAT STATUS</small><h2 id="seatDialogTitle">A001</h2></div><button value="cancel" aria-label="닫기">×</button></div>
+      <div class="seat-update-card">
+        <span id="seatDialogState">이용 가능</span>
+        <small>마지막 갱신 시간</small>
+        <strong id="seatLastUpdated">기록 없음</strong>
+      </div>
+      <p class="dialog-copy">좌석 QR이 마지막으로 인식된 시각입니다. 스캔 후 50분 동안 이용 중으로 표시됩니다.</p>
     </form>
   </dialog>
 

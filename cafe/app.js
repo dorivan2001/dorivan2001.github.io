@@ -90,7 +90,6 @@ function selectStore(storeId){
 function renderStores(){
   const store = currentStore();
   $$("[data-store-name]").forEach(element => { element.textContent = store.name; });
-  $$("[data-store-code]").forEach(element => { element.textContent = `${store.code} ZONE · ${store.brand}`; });
   $("#storeList").innerHTML = stores.map(item => `
     <button type="button" class="store-option ${item.id === state.storeId ? "active" : ""}" data-store-id="${item.id}">
       <span>⌂</span>
@@ -105,13 +104,6 @@ function availableSeatCount(){
   return storeSeats().filter(seat => !isOccupied(state.seatRecords.get(seat.id))).length;
 }
 
-function remainingText(record){
-  const until = occupiedUntil(record);
-  if(!until || until.getTime() <= Date.now()) return "이용 가능";
-  const minutes = Math.max(1, Math.ceil((until.getTime() - Date.now()) / 60_000));
-  return `${minutes}분 남음`;
-}
-
 function renderSeats(){
   const available = availableSeatCount();
   const total = storeSeats().length;
@@ -124,7 +116,7 @@ function renderSeats(){
     const record = state.seatRecords.get(seat.id);
     const occupied = isOccupied(record);
     return `<button class="seat ${occupied ? "occupied" : ""}" data-seat-id="${seat.id}">
-      <strong>${seat.id}</strong><span>${remainingText(record)}</span>
+      <strong>${seat.id}</strong><span>${occupied ? "이용 중" : "이용 가능"}</span>
     </button>`;
   }).join("");
   $$("[data-seat-id]").forEach(button => button.addEventListener("click", () => openSeat(button.dataset.seatId)));
@@ -150,11 +142,21 @@ function renderAll(){
 }
 
 function openSeat(seatId){
-  const url = new URL(location.href);
-  url.search = "";
-  url.searchParams.set("seat", seatId);
+  const record = state.seatRecords.get(seatId);
+  const scannedAt = recordDate(record);
+  const occupied = isOccupied(record);
   $("#seatDialogTitle").textContent = seatId;
-  $("#seatUrl").textContent = url.toString();
+  $("#seatDialogState").textContent = occupied ? "이용 중" : "이용 가능";
+  $("#seatDialogState").classList.toggle("occupied", occupied);
+  $("#seatLastUpdated").textContent = scannedAt
+    ? scannedAt.toLocaleString("ko-KR", {
+        year:"numeric",
+        month:"long",
+        day:"numeric",
+        hour:"2-digit",
+        minute:"2-digit"
+      })
+    : "기록 없음";
   $("#seatDialog").showModal();
 }
 
@@ -240,14 +242,6 @@ $$("[data-go]").forEach(button => button.addEventListener("click", () => go(butt
 $$("[data-open-stores]").forEach(button => button.addEventListener("click", () => $("#storeDialog").showModal()));
 $("#backButton").addEventListener("click", () => go("home"));
 $("#menuSearch").addEventListener("input", renderMenus);
-$("#copySeatUrl").addEventListener("click", async () => {
-  try{
-    await navigator.clipboard.writeText($("#seatUrl").textContent);
-    showToast("QR 주소를 복사했습니다.");
-  }catch{
-    showToast("주소를 길게 눌러 복사해 주세요.");
-  }
-});
 
 onAuthStateChanged(auth, async user => {
   if(user){
